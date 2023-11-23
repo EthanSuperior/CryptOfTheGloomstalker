@@ -1,0 +1,84 @@
+[gd_scene load_steps=3 format=3 uid="uid://s6ee00kkvyio"]
+
+[ext_resource type="Script" path="res://scripts/Menu.gd" id="1_6wv5r"]
+[ext_resource type="Texture2D" uid="uid://b1aoeo8nk4e2c" path="res://assets/GameIcon.png" id="1_w5jjj"]
+
+[node name="Menu" type="Node2D"]
+script = ExtResource("1_6wv5r")
+
+[node name="GameIcon" type="Sprite2D" parent="."]
+position = Vector2(-17, 0)
+scale = Vector2(27, 27)
+texture = ExtResource("1_w5jjj")
+centered = false
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = 7.0
+offset_right = 1148.0
+offset_bottom = 667.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1, 0.988955)
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "[font_size=90][center][color=black]Crypt of the Gloomstalker
+
+[font_size=14]
+
+
+
+
+
+
+[font_size=80]
+[color=black]~ Gilden Glaciers ~"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = 1.0
+offset_right = 1142.0
+offset_bottom = 661.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1, 0.988955)
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "[font_size=90][center][color=cyan]Crypt of the Gloomstalker
+
+[font_size=14]
+
+
+
+
+
+
+[font_size=80]
+[color=gold]~ Gilden Glaciers ~"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+
+[node name="Button" type="Button" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 445.0
+offset_top = 307.0
+offset_right = 492.0
+offset_bottom = 338.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(5.63134, 5.63134)
+text = "PLAY"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
