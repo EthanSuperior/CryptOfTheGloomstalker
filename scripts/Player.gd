@@ -3,7 +3,7 @@ extends CharacterBody2D
 const SPEED = 100.0
 var face_direction = Vector2i.UP
 var tile_position = Vector2i()
-var death_time = SETTINGS.START_PLAY_TIME
+var death_time = SETTINGS.START_PLAY_TIME + Time.get_ticks_msec()
 var dark_time = 0
 var shadow_start_time = 0
 var gold = 0
@@ -15,6 +15,16 @@ var map: TileMap
 @onready var gold_text = $UI/MarginContainer/HFlowContainer/GoldText
 @onready var gradiant: Gradient = $UI/MarginContainer/GradiantBackground.get_texture().get_gradient()
 # CHARACTER MOVEMENT
+func _enter_tree():
+	face_direction = Vector2i.UP
+	tile_position = Vector2i()
+	death_time = SETTINGS.START_PLAY_TIME + Time.get_ticks_msec()
+	dark_time = 0
+	shadow_start_time = 0
+	gold = 0
+	looted = false
+	light_level = 0
+	game_over = false
 func _ready():
 	await owner.ready
 	map = get_parent().MAP
@@ -48,7 +58,17 @@ func _process(delta):
 	in_the_shadows(delta)
 	var time_left = death_time - Time.get_ticks_msec()
 	var dark_time_left = SETTINGS.MAX_DARK_TIME * (1+looted) - dark_time
-	gold_text.text = '[font_size=60][center][color=gold]GOLD: %d' % gold
+	var color = Color(1, 0.843137, 0, 1)
+	if (time_left < 5*SETTINGS.ONE_SEC):
+		color = color.lerp(Color.WHITE, (int(time_left)%500)/500.0)
+		if (light_level != 0):
+			gradiant.colors[1] = color
+			gradiant.colors[1].a = .1
+		else:
+			gradiant.colors[1].r = 0
+			gradiant.colors[1].g = 0
+			gradiant.colors[1].b = 0
+	gold_text.text = '[font_size=60][center][color=%s]GOLD: %d' % [color.to_html(),gold]
 	if time_left <= 0: escaped_cave()
 	elif dark_time >= SETTINGS.MAX_DARK_TIME * (1+looted): got_eaten()
 
@@ -58,7 +78,8 @@ func in_the_shadows(delta):
 	sprite.modulate = Color(rgb,1-rgb,1-rgb)
 	if light_level != 0 || game_over:
 		if(shadow_start_time != 0):
-			create_tween().tween_method(func(v):gradiant.colors[1].a=v, gradiant.colors[1].a,0, .25)
+			gradiant.colors[1] = Color.BLACK
+			create_tween().tween_method(func(v): gradiant.colors[1].a=v, gradiant.colors[1].a,0, .25)
 		shadow_start_time = 0
 		dark_time = 0
 		looted = 0
@@ -77,16 +98,20 @@ func action_key():
 
 #GAME OVERS
 func escaped_cave():
-	GameOver("  CONGRATS!\nOBTAINED %d GOLD!!!" % gold, Color.WHITE)
+	gradiant.colors[1].a = 0
+	GameOver(" CONGRATS YOU GOT:\n    %d GOLD!!!" % gold, Color.WHITE)
 func got_eaten():
-	GameOver("  YOU GOT EATEN!\nYOU LOST %d GOLD" % gold, Color.RED)
+	GameOver(" YOU GOT EATEN!\nYOU LOST %d GOLD" % gold, Color.RED)
 func GameOver(msg, txtColor):
 	game_over = true
 	var winPopup: Label = Label.new()  # or Label.new() if using Label
 	winPopup.set_text(msg)
-	winPopup.scale = Vector2(.75,.75)
+	winPopup.scale = Vector2(.60,.60)
 	winPopup.modulate = txtColor
 	add_child(winPopup)
 	winPopup.set_anchors_preset(Control.PRESET_CENTER)
 	winPopup.position = winPopup.get_rect().size/-2.0
-	get_tree().create_timer(3).timeout.connect(get_tree().change_scene_to_file.bind("res://scenes/Menu.tscn"))
+	get_tree().create_timer(3).timeout.connect(
+		func():
+			get_tree().change_scene_to_file("res://scenes/Menu.tscn"))
+
